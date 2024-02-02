@@ -69,18 +69,3 @@ class Pipelines:
 
 
 
-pipe = Pipe(
-        sourceType="MS SQL SERVER",
-        sources=["External.dbo.Test", "External.dbo.Test2"],
-        destinationType="MS SQL SERVER",
-        destination="RAD.dbo.Test",
-        frequency=None,
-        logfile=None,
-        filepath="LogidatasetTest.lgx"
-    )
-
-pipe.save('tst.json')
-
-container = Pipelines(Pipes=[pipe,pipe])
-
-print(container)

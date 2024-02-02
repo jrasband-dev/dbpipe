@@ -1,2 +1,7 @@
 pipes
 
+dbpipe.egg-info
+
+venv
+
+__pycache__
