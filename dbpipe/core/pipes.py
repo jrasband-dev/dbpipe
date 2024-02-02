@@ -5,13 +5,41 @@ import os
 
 @dataclass
 class Pipe:
-    sourceType:str
+    """
+    A data structure to document and track data pipelines
+
+    Attributes:
+    ----------
+    sourceType: str
+        Where the data is coming from
+
     sources: List[str]
+        The Physical Location of the data. For APIs, this can be the endpoint. For databases, this can be the tables you are pulling from.
+
     destinationType: Optional[str]
-    destination: Optional[str]
+        The endpoint or table where the data will be loaded.
+
     frequency: Optional[str]
+        How often is the pipeline is running
+    
     logfile: Optional[str]
-    filepath: str 
+        The location of the log. Used to troubleshoot the pipeline
+
+    filepath: str
+        The location of the pipeline process file
+
+    schedule: List[str]
+        A list of scheduled Days and Times that the pipeline runs
+    
+    """
+    sourceType: str
+    sources: List[str]
+    destinationType: Optional[str] = None
+    destination: Optional[str] = None 
+    frequency: Optional[str] = None
+    logfile: Optional[str] = None
+    filepath: Optional[str] = None
+    schedule: Optional[List[str]] = None
 
     def __str__(self):
         pipe_dict = {
@@ -21,7 +49,8 @@ class Pipe:
             "destination": self.destination,
             "frequency": self.frequency,
             "logfile": self.logfile,
-            "filepath": self.filepath
+            "filepath": self.filepath,
+            "schedule":self.schedule,
         }
         return json.dumps(pipe_dict, indent=4)
 
@@ -39,7 +68,8 @@ class Pipe:
             "destination": self.destination,
             "frequency": self.frequency,
             "logfile": self.logfile,
-            "filepath": self.filepath
+            "filepath": self.filepath,
+            "schedule":self.schedule,
         }
 
         # Create the "pipes" directory if it doesn't exist
