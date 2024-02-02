@@ -1,7 +1,40 @@
-from dataclasses import dataclass, field
-from typing import List, Optional, Literal
+from dataclasses import dataclass, field, asdict
+from typing import List, Optional, Literal, Type
 import json
 import os
+from datetime import datetime, timedelta
+
+
+@dataclass
+class Schedule:
+    frequency: str
+    start_time: str
+    end_time: Optional[str] = None
+    time_zone: str = 'UTC'
+
+    def __repr__(self):
+        return str(asdict(self))
+
+    def to_json(self):
+        return json.dumps(asdict(self))
+
+
+
+    # def __post_init__(self):
+    #     valid_frequencies = {"hourly", "daily", "monthly"}
+    #     if self.frequency is not None and self.frequency not in valid_frequencies:
+    #         raise ValueError("Frequency must be one of 'hourly', 'daily', 'monthly'")
+
+
+
+class ScheduleEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Schedule):
+            return obj.__dict__
+        return json.JSONEncoder.default(self, obj)
+
+
+
 
 @dataclass
 class Pipe:
@@ -10,66 +43,54 @@ class Pipe:
 
     Attributes:
     ----------
-    sourceType: str
-        Where the data is coming from
+    name: str
+        Name of the pipeline
 
     sources: List[str]
-        The Physical Location of the data. For APIs, this can be the endpoint. For databases, this can be the tables you are pulling from.
+        The physical Location of the data. For APIs, this can be the endpoint. For databases, this can be the tables you are pulling from.
 
-    destinationType: Optional[str]
+    destination: Optional[str]
         The endpoint or table where the data will be loaded.
 
-    frequency: Optional[str]
-        How often is the pipeline is running
+    schedule: Optional[Schedule]
+        Add an optional Schedule Object
     
     logfile: Optional[str]
         The location of the log. Used to troubleshoot the pipeline
 
-    filepath: str
+    processfile: str
         The location of the pipeline process file
 
-    schedule: List[str]
-        A list of scheduled Days and Times that the pipeline runs
     
     """
-    sourceType: str
+    name: str
     sources: List[str]
-    destinationType: Optional[str] = None
-    destination: Optional[str] = None 
-    frequency: Optional[str] = None
+    destination: str
+    schedule: Optional[Type[Schedule]] = None
     logfile: Optional[str] = None
-    filepath: Optional[str] = None
-    schedule: Optional[List[str]] = None
+    processfile: Optional[str] = None
 
     def __str__(self):
         pipe_dict = {
-            "sourceType": self.sourceType,
+            "name": self.name,
             "sources": self.sources,
-            "destinationType": self.destinationType,
             "destination": self.destination,
-            "frequency": self.frequency,
+            "schedule": self.schedule,
             "logfile": self.logfile,
-            "filepath": self.filepath,
-            "schedule":self.schedule,
+            "processfile": self.processfile,
         }
-        return json.dumps(pipe_dict, indent=4)
+        return json.dumps(pipe_dict, indent=4, cls=ScheduleEncoder)
 
-
-    def __post_init__(self):
-        valid_frequencies = {"hourly", "daily", "monthly"}
-        if self.frequency is not None and self.frequency not in valid_frequencies:
-            raise ValueError("Frequency must be one of 'hourly', 'daily', 'monthly'")
         
     def save(self, file_name: str):
         pipe_dict = {
-            "sourceType": self.sourceType,
+            "name": self.name,
             "sources": self.sources,
-            "destinationType": self.destinationType,
-            "destination": self.destination,
-            "frequency": self.frequency,
-            "logfile": self.logfile,
-            "filepath": self.filepath,
             "schedule":self.schedule,
+            "destination": self.destination,
+            "logfile": self.logfile,
+            "processfile": self.processfile,
+            
         }
 
         # Create the "pipes" directory if it doesn't exist
@@ -81,7 +102,24 @@ class Pipe:
 
         # Write the JSON data to the file
         with open(file_path, 'w') as file:
-            json.dump(pipe_dict, file, indent=4)
+            json.dump(pipe_dict, file, indent=4, cls=ScheduleEncoder)
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @dataclass
 class Pipelines:

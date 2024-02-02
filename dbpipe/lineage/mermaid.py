@@ -30,7 +30,7 @@ def generate_mermaid_markdown_file(folder_path, output_file_path):
     # Write all accumulated Mermaid diagrams to a new Markdown file
     with open(output_file_path, 'w') as output_file:
         output_file.write("```mermaid\n")
-        output_file.write("graph TD;\n")
+        output_file.write("graph LR;\n")
         for diagram in mermaid_diagrams:
             output_file.write(diagram.strip() + "\n")
         output_file.write("```\n")
