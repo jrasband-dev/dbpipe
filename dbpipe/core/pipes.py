@@ -5,31 +5,11 @@ import os
 from datetime import datetime, timedelta
 
 
-@dataclass
-class Schedule:
-    frequency: str
-    start_time: str
-    end_time: Optional[str] = None
-    time_zone: str = 'UTC'
-
-    def __repr__(self):
-        return str(asdict(self))
-
-    def to_json(self):
-        return json.dumps(asdict(self))
-
-
-
-    # def __post_init__(self):
-    #     valid_frequencies = {"hourly", "daily", "monthly"}
-    #     if self.frequency is not None and self.frequency not in valid_frequencies:
-    #         raise ValueError("Frequency must be one of 'hourly', 'daily', 'monthly'")
-
-
-
-class ScheduleEncoder(json.JSONEncoder):
+class Encoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Schedule):
+            return obj.__dict__
+        if isinstance(obj, Pipe):
             return obj.__dict__
         return json.JSONEncoder.default(self, obj)
 
@@ -52,9 +32,6 @@ class Pipe:
     destination: Optional[str]
         The endpoint or table where the data will be loaded.
 
-    schedule: Optional[Schedule]
-        Add an optional Schedule Object
-    
     logfile: Optional[str]
         The location of the log. Used to troubleshoot the pipeline
 
@@ -66,27 +43,23 @@ class Pipe:
     name: str
     sources: List[str]
     destination: str
-    schedule: Optional[Type[Schedule]] = None
     logfile: Optional[str] = None
     processfile: Optional[str] = None
-
-    def __str__(self):
-        pipe_dict = {
-            "name": self.name,
-            "sources": self.sources,
-            "destination": self.destination,
-            "schedule": self.schedule,
-            "logfile": self.logfile,
-            "processfile": self.processfile,
-        }
-        return json.dumps(pipe_dict, indent=4, cls=ScheduleEncoder)
-
+    
+    def __repr__(self):
+        return str(asdict(self))
+    
+    def to_dict(self):
+        return asdict(self)
+    
         
-    def save(self, file_name: str):
+    def save(self):
+        """
+        Saves Pipe as a JSON File.
+        """
         pipe_dict = {
             "name": self.name,
             "sources": self.sources,
-            "schedule":self.schedule,
             "destination": self.destination,
             "logfile": self.logfile,
             "processfile": self.processfile,
@@ -98,41 +71,72 @@ class Pipe:
             os.makedirs("pipes")
 
         # Construct the file path within the "pipes" directory
-        file_path = os.path.join("pipes", file_name)
+        file_path = os.path.join("pipes", self.name+'.json')
 
         # Write the JSON data to the file
         with open(file_path, 'w') as file:
-            json.dump(pipe_dict, file, indent=4, cls=ScheduleEncoder)
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
+            json.dump(pipe_dict, file, indent=4, cls=Encoder)
 
 
 
 @dataclass
-class Pipelines:
-    Pipes: List[Pipe]
+class Schedule:
+    frequency: str
+    start_time: str
+    end_time: Optional[str] = None
+    time_zone: str = 'UTC'
 
-    def __str__(self):
-        pipeline_dict = {
-            "Pipelines": [pipe.__dict__ for pipe in self.Pipes]
+    def __repr__(self):
+        return str(asdict(self))
+
+    def to_dict(self):
+        return asdict(self)
+
+
+
+
+
+        # def __post_init__(self):
+    #     valid_frequencies = {"hourly", "daily", "monthly"}
+    #     if self.frequency is not None and self.frequency not in valid_frequencies:
+    #         raise ValueError("Frequency must be one of 'hourly', 'daily', 'monthly'")
+
+
+
+    
+@dataclass
+class Job:
+    name: str
+    schedule: Type[Schedule]
+    jobs: List[Type[Pipe]]
+
+    def __repr__(self):
+        return str(asdict(self))
+
+    def to_dict(self):
+        return asdict(self)
+    
+
+
+
+    def save(self):
+        pipe_dict = {
+        "name": self.name,
+        "schedule":self.schedule,
+        "jobs": self.jobs
+
         }
-        return json.dumps(pipeline_dict, indent=4)
 
+        # Create the "pipes" directory if it doesn't exist
+        if not os.path.exists("jobs"):
+            os.makedirs("jobs")
 
+        # Construct the file path within the "pipes" directory
+        file_path = os.path.join("jobs", self.name+'.json')
 
+        # Write the JSON data to the file
+        with open(file_path, 'w') as file:
+            json.dump(pipe_dict, file, indent=4, cls=Encoder)
 
 
 
