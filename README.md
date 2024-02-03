@@ -26,12 +26,6 @@ pipe
 ```python
 pipe.save()
 ```
-# Lineage
-```python
-from dbpipe.lineage.mermaid import generate_mermaid_markdown_file
-
-generate_mermaid_markdown_file('pipes','test.md')
-```
 
 # Creating a Schedule
 
