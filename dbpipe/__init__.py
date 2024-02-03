@@ -1,4 +1,4 @@
-__version__ = "0.1.1"
+__version__ = "0.1.7"
 
 from dbpipe.core.pipes import (
     Pipe,
@@ -15,10 +15,10 @@ from dbpipe.io.jsonreader import(
 
 
 __all__ = [
-    Pipe,
-    Job,
-    Schedule,
-    read_pipe,
-    read_pipe
+    "Pipe",
+    "Job",
+    "Schedule",
+    "read_pipe",
+    "read_job"
     
 ]
