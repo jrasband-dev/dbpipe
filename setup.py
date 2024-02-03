@@ -10,11 +10,11 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="dbpipe",
-    version="0.0.1",
+    version="0.1.0",
     description="Lightweight DataPipeline Documentation",
     long_description=README,
     long_description_content_type="text/markdown",
-    # url="https://github.com/jrasband-dev/dbpipe",
+    url="https://github.com/jrasband-dev/dbpipe",
     author="Jayden Rasband",
     author_email="jayden.rasband@gmail.com",
     license="MIT",
