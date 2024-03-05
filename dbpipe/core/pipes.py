@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field, asdict
-from typing import List, Optional, Literal, Type
+from typing import List, Optional, Literal, Type, Union
 import json
 import os
-from datetime import datetime, timedelta
 
 
 class Encoder(json.JSONEncoder):
@@ -11,10 +10,58 @@ class Encoder(json.JSONEncoder):
             return obj.__dict__
         if isinstance(obj, Pipe):
             return obj.__dict__
+        if isinstance(obj, EndPoint):
+            return obj.__dict__
         return json.JSONEncoder.default(self, obj)
 
+@dataclass
+class EndPoint:
+    """
+    A data structure to track Endpoints
 
+    Attributes:
+    ----------
+    name: str
+        Name of Endpoint
 
+    type: str
+        The type of endpoint. API, Database, or file.
+
+    location
+        The URL, filepath, or server location.
+    """
+    name: str
+    type: str
+    location: Optional[str]
+
+    def __repr__(self):
+        return str(asdict(self))
+    
+    def to_dict(self):
+        return asdict(self)
+    
+        
+    def save(self):
+        """
+        Saves Pipe as a JSON File.
+        """
+        endpoint_dict = {
+            "name": self.name,
+            "type":self.type,
+            "location":self.location
+            
+        }
+
+        # Create the "pipes" directory if it doesn't exist
+        if not os.path.exists("endpoints"):
+            os.makedirs("endpoints")
+
+        # Construct the file path within the "pipes" directory
+        file_path = os.path.join("endpoints", self.name+'.json')
+
+        # Write the JSON data to the file
+        with open(file_path, 'w') as file:
+            json.dump(endpoint_dict, file, indent=4, cls=Encoder)
 
 @dataclass
 class Pipe:
@@ -37,12 +84,10 @@ class Pipe:
 
     processfile: str
         The location of the pipeline process file
-
-    
     """
     name: str
-    sources: List[str]
-    destination: str
+    sources: List[Type[EndPoint]]
+    destination: Type[EndPoint]
     logfile: Optional[str] = None
     processfile: Optional[str] = None
     
@@ -51,6 +96,7 @@ class Pipe:
     
     def to_dict(self):
         return asdict(self)
+    
     
         
     def save(self):
@@ -76,6 +122,8 @@ class Pipe:
         # Write the JSON data to the file
         with open(file_path, 'w') as file:
             json.dump(pipe_dict, file, indent=4, cls=Encoder)
+
+
 
 
 
@@ -105,10 +153,39 @@ class Schedule:
 
     
 @dataclass
+class Cluster:
+    """
+    A class that contains multiple Pipe Objects
+    """
+
+    cluster: List[Type[Pipe]]
+
+    def __repr__(self):
+        return str(self.cluster)
+    
+    # def to_list(self):
+    #     return self.cluster
+
+    def __iter__(self):
+        return iter(self.cluster)
+    
+    def __str__(self):
+        return str([str(item) for item in self.cluster])
+
+    # # Implementing __len__ to make Cluster have a length
+    # def __len__(self):
+    #     return len(self.cluster)
+
+    # # Implementing __getitem__ to allow indexing
+    # def __getitem__(self, index):
+    #     return self.cluster[index]
+
+
+@dataclass
 class Job:
     name: str
     schedule: Type[Schedule]
-    jobs: List[Type[Pipe]]
+    jobs: List[Union[Type[Pipe], Type[Cluster]]]
 
     def __repr__(self):
         return str(asdict(self))
@@ -116,6 +193,9 @@ class Job:
     def to_dict(self):
         return asdict(self)
     
+    def __post_init__(self):
+        if isinstance(self.jobs, Cluster):
+            self.jobs = self.jobs.cluster
 
 
 
@@ -141,3 +221,5 @@ class Job:
 
 
 
+
+    
