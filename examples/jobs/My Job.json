@@ -1,0 +1,55 @@
+{
+    "name": "My Job",
+    "schedule": {
+        "frequency": "Daily",
+        "start_time": "8:00AM",
+        "end_time": null,
+        "time_zone": "UTC"
+    },
+    "jobs": [
+        {
+            "name": "DW",
+            "sources": [
+                {
+                    "name": "Facebook",
+                    "type": "API",
+                    "location": "https://facebook.com/Posts"
+                },
+                {
+                    "name": "Instagram",
+                    "type": "API",
+                    "location": "https://instagram.com/Posts"
+                }
+            ],
+            "destination": {
+                "name": "DW.Facebook.Posts",
+                "type": "Database",
+                "location": "ServerName"
+            },
+            "logfile": null,
+            "processfile": "Test.py"
+        },
+        {
+            "name": "DW",
+            "sources": [
+                {
+                    "name": "Facebook",
+                    "type": "API",
+                    "location": "https://facebook.com/Posts"
+                },
+                {
+                    "name": "Instagram",
+                    "type": "API",
+                    "location": "https://instagram.com/Posts"
+                }
+            ],
+            "destination": {
+                "name": "DW.Facebook.Posts",
+                "type": "Database",
+                "location": "ServerName"
+            },
+            "logfile": null,
+            "processfile": "Test.py"
+        }
+    ]
+}

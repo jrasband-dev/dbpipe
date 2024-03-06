@@ -9,12 +9,13 @@ def process_json_file(file_path, mermaid_diagrams):
 
 def generate_mermaid_markdown(data):
     sources = data.get("sources", [])
-    destination = data.get("destination", "")
+    destination = data.get("destination", {}).get("name", "")
 
     mermaid_markdown = ""
     for source in sources:
+        source_name = source.get("name", "")
         mermaid_markdown += f"""
-{source} -->{destination}"""
+    {source_name} --> {destination}"""
     return mermaid_markdown
 
 
@@ -34,6 +35,3 @@ def generate_mermaid_markdown_file(folder_path, output_file_path):
         for diagram in mermaid_diagrams:
             output_file.write(diagram.strip() + "\n")
         output_file.write("```\n")
-
-
-# generate_mermaid_markdown_file('pipes','pipes.md')

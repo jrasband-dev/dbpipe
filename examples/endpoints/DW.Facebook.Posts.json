@@ -1,0 +1,5 @@
+{
+    "name": "DW.Facebook.Posts",
+    "type": "Database",
+    "location": "ServerName"
+}
